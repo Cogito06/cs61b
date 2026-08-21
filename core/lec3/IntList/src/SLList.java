@@ -25,8 +25,8 @@ public class SLList {
         }
     }
     private IntNode sentinel;
-    public int size;
-    public static int defaultValue = 20071008;
+    private int size;
+    private static final int defaultValue = 20071008;
 
     public SLList(int x){
         sentinel = new IntNode(defaultValue, new IntNode(x, null));
