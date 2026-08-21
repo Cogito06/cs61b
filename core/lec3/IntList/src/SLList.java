@@ -40,7 +40,7 @@ public class SLList {
     }
 
     public void addFirst(int x){
-        sentinel = new IntNode(defaultValue, new IntNode(x, sentinel.next));
+        sentinel.next = new IntNode(x, sentinel.next);
         size ++;
     }
 
