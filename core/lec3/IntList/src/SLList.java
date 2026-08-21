@@ -1,16 +1,16 @@
 /** A link list without recursive constructor.*/
-public class SLList {
+public class SLList<LochNess> {
 
-    private static class IntNode{
-        public int item;
+    private class IntNode{
+        public LochNess item;
         public IntNode next;
 
-        public IntNode(int i, IntNode res) {
+        public IntNode(LochNess i, IntNode res) {
             item = i;
             next = res;
         }
 
-        public void addLast(int x){
+        public void addLast(LochNess x){
             if(next == null){
                 next = new IntNode(x, null);
             }
@@ -26,25 +26,24 @@ public class SLList {
     }
     private IntNode sentinel;
     private int size;
-    private static final int defaultValue = 20071008;
 
-    public SLList(int x){
-        sentinel = new IntNode(defaultValue, new IntNode(x, null));
+    public SLList(LochNess x){
+        sentinel = new IntNode(null, new IntNode(x, null));
         size = 1;
     }
 
     /** creating an empty list*/
     public SLList(){
-        sentinel = new IntNode(defaultValue, null);
+        sentinel = new IntNode(null, null);
         size = 0;
     }
 
-    public void addFirst(int x){
+    public void addFirst(LochNess x){
         sentinel.next = new IntNode(x, sentinel.next);
         size ++;
     }
 
-    public int getFirst(){
+    public LochNess getFirst(){
         return sentinel.next.item;
     }
 
@@ -52,12 +51,12 @@ public class SLList {
         return (size == 0);
     }
 
-    public void addLast(int x){
+    public void addLast(LochNess x){
         sentinel.addLast(x);
         size ++;
     }
 
-    public void iterateAddLast(int x){
+    public void iterateAddLast(LochNess x){
         IntNode curr = sentinel;
         while (curr.next != null) {
             curr = curr.next;
