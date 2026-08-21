@@ -24,27 +24,28 @@ public class SLList {
             else return (1 + this.next.size());
         }
     }
-    private IntNode first;
+    private IntNode sentinel;
     public int size;
+    public static int defaultValue = 20071008;
 
     public SLList(int x){
-        first = new IntNode(x, null);
+        sentinel = new IntNode(defaultValue, new IntNode(x, null));
         size = 1;
     }
 
     /** creating an empty list*/
     public SLList(){
-        first = null;
+        sentinel = new IntNode(defaultValue, null);
         size = 0;
     }
 
     public void addFirst(int x){
-        first = new IntNode(x, first);
+        sentinel = new IntNode(defaultValue, new IntNode(x, sentinel.next));
         size ++;
     }
 
     public int getFirst(){
-        return first.item;
+        return sentinel.next.item;
     }
 
     public boolean isEmpty(){
@@ -52,40 +53,26 @@ public class SLList {
     }
 
     public void addLast(int x){
-        if(this.isEmpty()) {
-            first = new IntNode(x, null);
-        }
-        else {
-            if (first.next == null) {
-                first.next = new IntNode(x, null);
-            } else {
-                first.next.addLast(x);
-            }
-        }
+        sentinel.addLast(x);
         size ++;
     }
 
     public void iterateAddLast(int x){
-        if(isEmpty()){
-            first = new IntNode(x, null);
+        IntNode curr = sentinel;
+        while (curr.next != null) {
+            curr = curr.next;
         }
-        else {
-            IntNode curr = first;
-            while (curr.next != null) {
-                curr = curr.next;
-            }
-            curr.next = new IntNode(x, null);
-        }
+        curr.next = new IntNode(x, null);
         size ++;
     }
 
     public int size(){
-        return first.size();
+        return sentinel.size() - 1;
     }
 
     public int iterateSize(){
-        int totLen = 1;
-        IntNode curr = first;
+        int totLen = 0;
+        IntNode curr = sentinel;
         while(curr.next != null){
             totLen += 1;
             curr = curr.next;
