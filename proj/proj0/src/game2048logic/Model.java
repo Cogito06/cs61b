@@ -123,7 +123,25 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        if(emptySpaceExists()) return true;
+        int[] dx = {1, -1, 0, 0};
+        int[] dy = {0, 0, 1, -1};
+        for(int x = 0; x < board.size(); x ++){
+            for (int y = 0; y < board.size(); y ++){
+                Tile cur = board.tile(x, y);
+                if (cur == null) continue;
+
+                for(int k = 0; k < 4; k ++){
+                    int nxtX = x + dx[k];
+                    int nxtY = y + dy[k];
+                    if(nxtX < 0 || nxtX >= board.size() || nxtY < 0 || nxtY >= board.size() || board.tile(nxtX, nxtY) == null){
+                        continue;
+                    }
+                    Tile nxt = tile(nxtX, nxtY);
+                    if(cur.value() == nxt.value()) return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -145,6 +163,16 @@ public class Model {
         Tile currTile = board.tile(x, y);
         int myValue = currTile.value();
         int targetY = y;
+
+        while(targetY+1 < size() && tile(x, targetY + 1) == null){
+            targetY = targetY + 1;
+        }
+        if(targetY == size() - 1 || tile(x, targetY+1).value() != myValue || tile(x, targetY+1).wasMerged()) {
+            board.move(x, targetY, currTile);
+        }
+        else{
+            board.move(x, targetY + 1, currTile);
+        }
 
         // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
