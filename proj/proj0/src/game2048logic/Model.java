@@ -174,6 +174,7 @@ public class Model {
             }
         } else {
             board.move(x, targetY + 1, currTile);
+            score += (2*myValue);
         }
         // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
