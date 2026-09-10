@@ -168,20 +168,12 @@ public class Model {
             targetY = targetY + 1;
         }
 
-        if(targetY != y) {
-            if (targetY == size() - 1 || tile(x, targetY + 1).value() != myValue || tile(x, targetY + 1).wasMerged()) {
+        if (targetY == size() - 1 || tile(x, targetY + 1).value() != myValue || tile(x, targetY + 1).wasMerged()) {
+            if(targetY != y) {
                 board.move(x, targetY, currTile);
-            } else {
-                board.move(x, targetY + 1, currTile);
             }
-        }
-        else{
-            if (targetY == size() - 1 || tile(x, targetY + 1).value() != myValue || tile(x, targetY + 1).wasMerged()) {
-
-            }
-            else {
-                board.move(x, targetY + 1, currTile);
-            }
+        } else {
+            board.move(x, targetY + 1, currTile);
         }
         // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
