@@ -193,9 +193,11 @@ public class Model {
     }
 
     public void tilt(Side side) {
+        board.setViewingPerspective(side);
         for(int x = 0; x < size(); x ++){
             tiltColumn(x);
         }
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.
