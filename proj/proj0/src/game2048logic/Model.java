@@ -167,13 +167,22 @@ public class Model {
         while(targetY+1 < size() && tile(x, targetY + 1) == null){
             targetY = targetY + 1;
         }
-        if(targetY == size() - 1 || tile(x, targetY+1).value() != myValue || tile(x, targetY+1).wasMerged()) {
-            board.move(x, targetY, currTile);
+
+        if(targetY != y) {
+            if (targetY == size() - 1 || tile(x, targetY + 1).value() != myValue || tile(x, targetY + 1).wasMerged()) {
+                board.move(x, targetY, currTile);
+            } else {
+                board.move(x, targetY + 1, currTile);
+            }
         }
         else{
-            board.move(x, targetY + 1, currTile);
-        }
+            if (targetY == size() - 1 || tile(x, targetY + 1).value() != myValue || tile(x, targetY + 1).wasMerged()) {
 
+            }
+            else {
+                board.move(x, targetY + 1, currTile);
+            }
+        }
         // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
 
@@ -183,11 +192,18 @@ public class Model {
      * so we are tilting the tiles in this column up.
      * */
     public void tiltColumn(int x) {
-        // TODO: Task 7. Fill in this function.
+        for(int y = size() - 1; y >= 0; y --){
+            Tile curr = tile(x, y);
+            if(curr != null){
+                moveTileUpAsFarAsPossible(x, y);
+            }
+        }
     }
 
     public void tilt(Side side) {
-        // TODO: Tasks 8 and 9. Fill in this function.
+        for(int x = 0; x < size(); x ++){
+            tiltColumn(x);
+        }
     }
 
     /** Tilts every column of the board toward SIDE.
