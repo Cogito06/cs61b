@@ -34,6 +34,7 @@ public class BeeCountingStage implements AdventureStage {
             System.out.println(msg);
             int count = 0;
             int expectedSum = 0;
+            this.input = new ArrayList<>();
 
             while (count < 3) {
                 int currNum = SOME_NEAT_NUMBERS[StdRandom.uniform(SOME_NEAT_NUMBERS.length)];
@@ -52,7 +53,6 @@ public class BeeCountingStage implements AdventureStage {
                 expectedSum += currNum;
 
                 // bug: this.input is null
-                this.input = new ArrayList<>();
                 this.input.add(input);
                 if (count < 2) {
                     System.out.println("How about now?");
@@ -87,7 +87,8 @@ public class BeeCountingStage implements AdventureStage {
      */
     private int sumInput() {
         int sum = 0;
-        for (int i = 0; i <= this.input.size(); i++) {
+        // Bug: Out of Range
+        for (int i = 0; i < this.input.size(); i++) {
             sum += Integer.parseInt(this.input.get(i));
         }
         return sum;
