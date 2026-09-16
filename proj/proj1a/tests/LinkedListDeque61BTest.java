@@ -153,4 +153,47 @@ public class LinkedListDeque61BTest {
         assertThat(lld1.getRecursive(5)).isEqualTo("Mr. Owl");
         assertThat(lld1.getRecursive(114514)).isEqualTo(null);
     }
+
+    @Test
+    /** Integration test: instead of testing addFirst/addLast/removeFirst/removeLast/get/size/isEmpty
+     *  in isolation, this interleaves all of them and checks the deque's state after every single
+     *  call, so it catches bugs that only show up when operations are combined. */
+    public void integrationTest() {
+        Deque61B<Integer> lld1 = new LinkedListDeque61B<>();
+        assertThat(lld1.isEmpty()).isTrue();
+        assertThat(lld1.size()).isEqualTo(0);
+
+        lld1.addLast(1);                 // [1]
+        lld1.addFirst(0);                // [0, 1]
+        lld1.addLast(2);                 // [0, 1, 2]
+        lld1.addFirst(-1);               // [-1, 0, 1, 2]
+
+        assertThat(lld1.isEmpty()).isFalse();
+        assertThat(lld1.size()).isEqualTo(4);
+        assertThat(lld1.toList()).containsExactly(-1, 0, 1, 2).inOrder();
+        assertThat(lld1.get(0)).isEqualTo(-1);
+        assertThat(lld1.get(3)).isEqualTo(2);
+        assertThat(lld1.get(4)).isEqualTo(null);
+        assertThat(lld1.getRecursive(2)).isEqualTo(1);
+
+        assertThat(lld1.removeFirst()).isEqualTo(-1); // [0, 1, 2]
+        assertThat(lld1.removeLast()).isEqualTo(2);   // [0, 1]
+        assertThat(lld1.size()).isEqualTo(2);
+        assertThat(lld1.toList()).containsExactly(0, 1).inOrder();
+
+        lld1.addLast(3);                 // [0, 1, 3]
+        assertThat(lld1.get(2)).isEqualTo(3);
+        assertThat(lld1.getRecursive(2)).isEqualTo(3);
+
+        assertThat(lld1.removeFirst()).isEqualTo(0); // [1, 3]
+        assertThat(lld1.removeFirst()).isEqualTo(1); // [3]
+        assertThat(lld1.removeLast()).isEqualTo(3);  // []
+
+        assertThat(lld1.isEmpty()).isTrue();
+        assertThat(lld1.size()).isEqualTo(0);
+        assertThat(lld1.removeFirst()).isEqualTo(null);
+        assertThat(lld1.removeLast()).isEqualTo(null);
+        assertThat(lld1.get(0)).isEqualTo(null);
+        assertThat(lld1.toList()).isEmpty();
+    }
 }
