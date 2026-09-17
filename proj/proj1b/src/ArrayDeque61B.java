@@ -77,7 +77,7 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
             head = newHead;
         }
         else {
-            Items[0] = x;
+            Items[head] = x;
         }
 
         size++;
@@ -95,7 +95,7 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
             tail = newTail;
         }
         else{
-            Items[0] = x;
+            Items[head] = x;
         }
 
         size++;
@@ -125,13 +125,31 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     public T removeFirst() {
         if(!isEmpty()){
             T returnValue = Items[head];
+            size --;
+            Items[head] = null;
 
+            int newHead = Math.floorMod(head + 1, arrSize);
+            if(size != 0) {
+                head = newHead;
+            }
+            return returnValue;
         }
         return null;
     }
 
     @Override
     public T removeLast() {
+        if(!isEmpty()){
+            T returnValue = Items[tail];
+            size --;
+            Items[tail] = null;
+
+            int newTail = Math.floorMod(tail - 1, arrSize);
+            if(size != 0){
+                tail = newTail;
+            }
+            return returnValue;
+        }
         return null;
     }
 
@@ -146,6 +164,19 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
 
     @Override
     public T getRecursive(int index) {
+        if(index >= 0 && index < size){
+            return getRecursiveHelper(head, index);
+        }
         return null;
+    }
+
+    private T getRecursiveHelper(int currPos, int index){
+        if(index == 0){
+            return Items[currPos];
+        }
+        else{
+            int nxtPos = Math.floorMod(currPos + 1, arrSize);
+            return getRecursiveHelper(nxtPos, index - 1);
+        }
     }
 }
