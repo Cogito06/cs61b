@@ -65,6 +65,26 @@ public class ArrayDeque61BTest {
 
         List<String> expected = List.of("We have to resize", "It seems.....", "Seven", "Mr. Crow", "Mr. Owl", "Mother",
                 "Father", "World", "Hello");
-        assertThat(llq1.toList()).containsExactly(expected);
+        assertThat(llq1.toList()).containsExactlyElementsIn(expected).inOrder();
+    }
+
+    @Test
+    void addLastTest(){
+        ArrayDeque61B<String> llq1 = new ArrayDeque61B<>();
+
+        llq1.addLast("Hello");
+        llq1.addLast("World");
+        llq1.addLast("Father");
+        llq1.addLast("Mother");
+        llq1.addLast("Mr. Owl");
+        llq1.addLast("Mr. Crow");
+        llq1.addLast("Seven");
+        llq1.addLast("It seems.....");
+        llq1.addLast("We have to resize");
+
+        List<String> expected = List.of("Hello", "World", "Father", "Mother", "Mr. Owl", "Mr. Crow",
+                "Seven", "It seems.....", "We have to resize");
+        assertThat(llq1.size()).isEqualTo(9);
+        assertThat(llq1.toList()).containsExactlyElementsIn(expected).inOrder();
     }
 }

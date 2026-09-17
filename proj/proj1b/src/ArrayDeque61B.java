@@ -1,5 +1,6 @@
 import net.sf.saxon.expr.ItemMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ObjDoubleConsumer;
 import java.lang.Math;
@@ -32,11 +33,17 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
         int newHead = head + (newSize - originalSize);
 
         // copy array
-        arrayCopy(Items, newArr, 0, tail, 0, tail);
-        arrayCopy(Items, newArr, head, originalSize-1, newHead, newSize-1);
+        if(head > tail) {
+            arrayCopy(Items, newArr, 0, tail, 0, tail);
+            arrayCopy(Items, newArr, head, originalSize - 1, newHead, newSize - 1);
+
+            head = newHead;
+        }
+        else{
+            arrayCopy(Items, newArr, head, tail, head, tail);
+        }
 
         Items = newArr;
-        head = newHead;
         arrSize = newSize;
     }
 
@@ -96,7 +103,12 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
 
     @Override
     public List<T> toList() {
-        return List.of();
+        List<T> returnList = new ArrayList<>();
+        for(int index = 0; index < size; index ++){
+            T curr = get(index);
+            returnList.addLast(curr);
+        }
+        return returnList;
     }
 
     @Override
@@ -111,6 +123,10 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
 
     @Override
     public T removeFirst() {
+        if(!isEmpty()){
+            T returnValue = Items[head];
+
+        }
         return null;
     }
 
