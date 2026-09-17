@@ -138,6 +138,68 @@ public class ArrayDeque61BTest {
     }
 
     @Test
+    void getTest(){
+        ArrayDeque61B<String> llq1 = new ArrayDeque61B<>();
+
+        // empty deque: any index is out of bounds
+        assertThat(llq1.get(0)).isNull();
+
+        // build via addLast then addFirst so head wraps and the 9th insert forces resize,
+        // same setup as removeFirstAfterResizeWithWrapTest - get() has to work across that boundary.
+        llq1.addLast("L1");
+        llq1.addLast("L2");
+        llq1.addLast("L3");
+        llq1.addLast("L4");
+        llq1.addFirst("F1");
+        llq1.addFirst("F2");
+        llq1.addFirst("F3");
+        llq1.addFirst("F4");
+        llq1.addFirst("F5");
+
+        List<String> expectedOrder = List.of("F5", "F4", "F3", "F2", "F1", "L1", "L2", "L3", "L4");
+        for (int i = 0; i < expectedOrder.size(); i++) {
+            assertWithMessage("get(" + i + ")").that(llq1.get(i)).isEqualTo(expectedOrder.get(i));
+        }
+
+        // out of bounds
+        assertThat(llq1.get(-1)).isNull();
+        assertThat(llq1.get(9)).isNull();
+        assertThat(llq1.get(100)).isNull();
+    }
+
+    @Test
+    void getRecursiveTest(){
+        ArrayDeque61B<String> llq1 = new ArrayDeque61B<>();
+
+        // empty deque: any index is out of bounds
+        assertThat(llq1.getRecursive(0)).isNull();
+
+        // same wrap-then-resize setup as getTest
+        llq1.addLast("L1");
+        llq1.addLast("L2");
+        llq1.addLast("L3");
+        llq1.addLast("L4");
+        llq1.addFirst("F1");
+        llq1.addFirst("F2");
+        llq1.addFirst("F3");
+        llq1.addFirst("F4");
+        llq1.addFirst("F5");
+
+        List<String> expectedOrder = List.of("F5", "F4", "F3", "F2", "F1", "L1", "L2", "L3", "L4");
+        for (int i = 0; i < expectedOrder.size(); i++) {
+            assertWithMessage("getRecursive(" + i + ")").that(llq1.getRecursive(i)).isEqualTo(expectedOrder.get(i));
+            // get() and getRecursive() must always agree
+            assertWithMessage("getRecursive(" + i + ") vs get(" + i + ")")
+                    .that(llq1.getRecursive(i)).isEqualTo(llq1.get(i));
+        }
+
+        // out of bounds
+        assertThat(llq1.getRecursive(-1)).isNull();
+        assertThat(llq1.getRecursive(9)).isNull();
+        assertThat(llq1.getRecursive(100)).isNull();
+    }
+
+    @Test
     void integrationTest(){
         // Exercises addFirst/addLast/removeFirst/removeLast/get/size/isEmpty/toList together,
         // forces a resize mid-sequence, then drains the deque to empty and adds again
@@ -200,5 +262,91 @@ public class ArrayDeque61BTest {
         assertThat(llq1.removeFirst()).isEqualTo(99);
         assertThat(llq1.toList()).containsExactly(100, 101).inOrder();
         assertThat(llq1.size()).isEqualTo(2);
+    }
+
+    /** Reads the private backing array so we can check its length directly - resizingDown's
+     *  effect isn't observable through any public method, only through size()-vs-capacity. */
+    private static int backingArrayLength(ArrayDeque61B<?> deque) {
+        try {
+            Field field = ArrayDeque61B.class.getDeclaredField("Items");
+            field.setAccessible(true);
+            return ((Object[]) field.get(deque)).length;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void resizingDownDoesNotCrashWellAboveThresholdTest(){
+        // Regression test: size=20 on a 32-slot array is 62.5% usage (nowhere near the 25%
+        // shrink threshold). A single removeFirst used to crash with ArrayIndexOutOfBoundsException
+        // because resizingDown() computed usage with integer division (size / arrSize), which
+        // truncates to 0 any time size < arrSize and made it shrink far too aggressively.
+        ArrayDeque61B<Integer> llq1 = new ArrayDeque61B<>();
+        for (int i = 1; i <= 20; i++) {
+            llq1.addLast(i);
+        }
+        assertThat(backingArrayLength(llq1)).isEqualTo(32);
+
+        Integer removed = llq1.removeFirst();
+
+        assertThat(removed).isEqualTo(1);
+        assertThat(llq1.size()).isEqualTo(19);
+        assertThat(backingArrayLength(llq1)).isEqualTo(32);
+    }
+
+    @Test
+    void resizingDownShrinksAtThresholdTest(){
+        ArrayDeque61B<Integer> llq1 = new ArrayDeque61B<>();
+        for (int i = 1; i <= 17; i++) {
+            llq1.addLast(i);
+        }
+        assertThat(backingArrayLength(llq1)).isEqualTo(32);
+
+        // usage stays above 25% of 32 (i.e. above 8) for the first 8 removals: 17 -> 9
+        for (int i = 0; i < 8; i++) {
+            llq1.removeFirst();
+        }
+        assertThat(llq1.size()).isEqualTo(9);
+        assertThat(backingArrayLength(llq1)).isEqualTo(32);
+
+        // the 9th removal brings size to 8, exactly 25% of 32 - should shrink to 16
+        llq1.removeFirst();
+        assertThat(llq1.size()).isEqualTo(8);
+        assertThat(backingArrayLength(llq1)).isEqualTo(16);
+        assertThat(llq1.toList()).containsExactly(10, 11, 12, 13, 14, 15, 16, 17).inOrder();
+    }
+
+    @Test
+    void resizingDownNeverShrinksBelowInitialCapacityTest(){
+        ArrayDeque61B<Integer> llq1 = new ArrayDeque61B<>();
+        llq1.addLast(1);
+        llq1.addLast(2);
+        llq1.removeFirst();
+        llq1.removeFirst();
+
+        assertThat(llq1.isEmpty()).isTrue();
+        assertThat(backingArrayLength(llq1)).isEqualTo(8);
+    }
+
+    @Test
+    void resizingDownThenEmptyThenAddAgainTest(){
+        // Shrinks the array down from repeated removals, drains it completely, then adds again -
+        // makes sure resizingDown's head/tail reset doesn't leave the deque in a corrupted state.
+        ArrayDeque61B<Integer> llq1 = new ArrayDeque61B<>();
+        for (int i = 1; i <= 17; i++) {
+            llq1.addLast(i);
+        }
+        while (!llq1.isEmpty()) {
+            llq1.removeFirst();
+        }
+        assertThat(llq1.isEmpty()).isTrue();
+
+        llq1.addLast(100);
+        llq1.addFirst(99);
+        llq1.addLast(101);
+
+        assertThat(llq1.toList()).containsExactly(99, 100, 101).inOrder();
+        assertThat(llq1.size()).isEqualTo(3);
     }
 }

@@ -47,6 +47,21 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
         arrSize = newSize;
     }
 
+    private void resizingDown(){
+        if(arrSize > 8 && (double) size / arrSize <= 0.25){
+            int newSize = arrSize / 2;
+            T[] newItem = (T[]) new Object[newSize];
+            for(int i = 0; i < size; i ++){
+                newItem[i] = get(i);
+            }
+
+            Items = newItem;
+            head = 0;
+            tail = (size == 0) ? 0 : size - 1;
+            arrSize = newSize;
+        }
+    }
+
     private void arrayCopy(T[] List1, T[] List2, int start1, int end1, int start2, int end2) {
         if(start1 >= 0 && start2 >= 0 && end1 < List1.length && end2 < List2.length) {
             int copySize = end1 - start1;
@@ -132,6 +147,8 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
             if(size != 0) {
                 head = newHead;
             }
+
+            resizingDown();
             return returnValue;
         }
         return null;
@@ -148,6 +165,8 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
             if(size != 0){
                 tail = newTail;
             }
+
+            resizingDown();
             return returnValue;
         }
         return null;
